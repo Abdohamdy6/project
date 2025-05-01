@@ -1,10 +1,12 @@
+
 from flask import Flask, render_template_string, request
 import pandas as pd
+import os
 
 app = Flask(__name__)
 
 # تحميل البيانات من ملف Excel
-sheet1_df = pd.read_excel(r"E:\Search engine V.1.1-1.xlsx", sheet_name="Sheet1")
+sheet1_df = pd.read_excel("data.xlsx", sheet_name="Sheet1")
 
 # HTML Template
 html_template = """
@@ -18,28 +20,24 @@ html_template = """
         .container { margin: 40px auto; width: 70%; }
         table { border-collapse: collapse; margin: auto; width: 100%; font-size: 18px; direction: rtl; background-color: #fff; }
         th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-        th { width: 40%; }  /* عرض عمود الدرجة */
-        td { width: 60%; }  /* عرض عمود البند */
+        th { width: 40%; }
+        td { width: 60%; }
         .title { background-color: orange; font-weight: bold; font-size: 20px; }
         .footer { background-color: #a0d080; font-style: italic; }
-
-        /* ألوان مخصصة مباشرة */
         .first-year { background-color: #e0f7fa; }
         .second-year { background-color: #fff3e0; }
         .third-year { background-color: #ede7f6; }
         .imsurgery { background-color: #d0e0ff; }
         .totals { background-color: #d0f8ce; }
         .rank { background-color: #ffe0f0; }
-
-        /* تكبير حجم حقل البحث */
         input[type="text"] {
-            font-size: 20px;  /* حجم الخط */
-            padding: 12px 20px;  /* حجم الحواف الداخلية */
-            width: 300px;  /* عرض الحقل */
+            font-size: 20px;
+            padding: 12px 20px;
+            width: 300px;
         }
         input[type="submit"] {
-            font-size: 18px; 
-            padding: 12px 20px; 
+            font-size: 18px;
+            padding: 12px 20px;
             margin-top: 10px;
         }
     </style>
@@ -51,11 +49,10 @@ html_template = """
             <input type="text" name="student_id" required>
             <input type="submit" value="بحث">
         </form>
-
         {% if result %}
         <table>
-            <tr><td colspan="2" class="title">اسم الطالب: {{ result['NAME'] }}</td></tr>  <!-- خانة الاسم -->
-            <tr><th class="title">الدرجة</th><th class="title">البند</th></tr>  <!-- رأس الجدول للبند والدرجة (معكوس)-->
+            <tr><td colspan="2" class="title">اسم الطالب: {{ result['NAME'] }}</td></tr>
+            <tr><th class="title">الدرجة</th><th class="title">البند</th></tr>
             {% for key, value in result.items() %}
                 {% if key != 'ID' and key != 'NAME' %}
                     {% set key_upper = key.upper().strip() %}
@@ -74,7 +71,7 @@ html_template = """
                     {% else %}
                         {% set css_class = '' %}
                     {% endif %}
-                    <tr class="{{ css_class }}"><td>{{ value }}</td><td>{{ key }}</td></tr>  <!-- معكوس هنا -->
+                    <tr class="{{ css_class }}"><td>{{ value }}</td><td>{{ key }}</td></tr>
                 {% endif %}
             {% endfor %}
             <tr class="footer"><td colspan="2">Designed by Abdo Hamdy Aly</td></tr>
@@ -101,7 +98,6 @@ def search():
             for key, val in raw_result.items():
                 if isinstance(val, float):
                     if '%' in key.upper() or key.strip().upper() in ['%', 'PERCENTAGE']:
-                        # لو القيمة <= 1 اعتبرها عشرية، فاضربها في 100
                         if val <= 1:
                             formatted_result[key] = f"{round(val * 100, 2)}%"
                         else:
@@ -116,4 +112,4 @@ def search():
     return render_template_string(html_template, result=result, searched=searched)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
