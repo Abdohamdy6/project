@@ -135,6 +135,11 @@ html_template = """
         {% if plot_url %}
             <h3>Student Score Distribution</h3>
             <img src="data:image/png;base64,{{ plot_url }}">
+            {% if percentile %}
+                <p style="font-size: 20px; font-weight: bold; color: black;">
+                    YOU ARE IN THE {{ percentile }}th PERCENTILE!
+                </p>
+            {% endif %}
         {% endif %}
         {% elif searched %}
             <p>لم يتم العثور على الطالب.</p>
@@ -148,6 +153,7 @@ html_template = """
 def search():
     result = None
     plot_url = None
+    percentile = None
     searched = False
 
     if request.method == 'POST':
@@ -172,27 +178,30 @@ def search():
                     formatted_result[key] = val
             result = formatted_result
 
-            # رسم الرسم البياني باللغة الإنجليزية
+            # رسم الرسم البياني مع حساب الـ PERCENTILE
             total_scores = sheet1_df['TOTAL'].dropna()
             student_score = raw_result.get('TOTAL')
 
-            plt.figure(figsize=(8, 5))
-            plt.hist(total_scores, bins=20, color='#66b3ff', edgecolor='black')
-            plt.axvline(student_score, color='orange', linestyle='solid', linewidth=2,
-                        label=f'Student Score: {student_score}')
-            plt.xlabel('Scores')
-            plt.ylabel('Number of Students')
-            plt.title('Score Distribution with Student Highlighted')
-            plt.legend()
+            if pd.notna(student_score):
+                percentile = round((total_scores < student_score).mean() * 100)
 
-            buf = io.BytesIO()
-            plt.savefig(buf, format='png')
-            buf.seek(0)
-            plot_url = base64.b64encode(buf.getvalue()).decode('utf8')
-            buf.close()
-            plt.close()
+                plt.figure(figsize=(8, 5))
+                plt.hist(total_scores, bins=20, color='#66b3ff', edgecolor='black')
+                plt.axvline(student_score, color='orange', linestyle='solid', linewidth=2,
+                            label=f'Student Score: {student_score}')
+                plt.xlabel('Scores')
+                plt.ylabel('Number of Students')
+                plt.title('Score Distribution with Student Highlighted')
+                plt.legend()
 
-    return render_template_string(html_template, result=result, searched=searched, plot_url=plot_url)
+                buf = io.BytesIO()
+                plt.savefig(buf, format='png')
+                buf.seek(0)
+                plot_url = base64.b64encode(buf.getvalue()).decode('utf8')
+                buf.close()
+                plt.close()
+
+    return render_template_string(html_template, result=result, searched=searched, plot_url=plot_url, percentile=percentile)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
