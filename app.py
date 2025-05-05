@@ -13,45 +13,112 @@ html_template = """
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نتيجة الطالب</title>
+    <title>AFM 26 RESULTS</title>
     <style>
-        body { font-family: 'Arial'; background-color: #f0f0f0; text-align: center; }
-        .container { margin: 40px auto; width: 70%; }
-        table { border-collapse: collapse; margin: auto; width: 100%; font-size: 18px; direction: rtl; background-color: #fff; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-        th { width: 40%; }
-        td { width: 60%; }
-        .title { background-color: orange; font-weight: bold; font-size: 20px; }
-        .footer { background-color: #a0d080; font-style: italic; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8; /* خلفية ناعمة متناسقة */
+            text-align: center;
+        }
+
+        .container {
+            margin: 60px auto;
+            width: 70%;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: auto;
+            width: 100%;
+            font-size: 18px;
+            direction: rtl;
+            background-color: #fff;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            width: 40%;
+        }
+
+        td {
+            width: 60%;
+            font-weight: bold;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 20px;
+            background-color: #b3e5fc; /* أزرق سماوي خفيف */
+            color: #000;
+        }
+
+        .footer {
+            background-color: #a0d080;
+            font-style: italic;
+        }
+
         .first-year { background-color: #e0f7fa; }
         .second-year { background-color: #fff3e0; }
         .third-year { background-color: #ede7f6; }
         .imsurgery { background-color: #d0e0ff; }
         .totals { background-color: #d0f8ce; }
         .rank { background-color: #ffe0f0; }
-        input[type="text"] {
-            font-size: 20px;
-            padding: 12px 20px;
-            width: 300px;
+
+        form {
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
+        label.title {
+            font-size: 28px;
+            font-weight: normal;
+            color: #333;
+            margin-bottom: 15px;
+            background: none; /* إزالة التظليل */
+        }
+
+        input[type="text"] {
+            font-size: 24px;
+            padding: 15px 25px;
+            width: 400px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
         input[type="submit"] {
-            font-size: 18px;
-            padding: 12px 20px;
-            margin-top: 10px;
+            font-size: 20px;
+            padding: 12px 24px;
+            margin-top: 15px;
+            border-radius: 8px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+        }
+
+        p {
+            font-size: 22px;
+            color: red;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <form method="POST">
-            <label class="title">ادخل رقم الطالب:</label><br>
+            <label class="title">ENTER ID</label><br>
             <input type="text" name="student_id" required>
-            <input type="submit" value="بحث">
+            <input type="submit" value="Search">
         </form>
         {% if result %}
         <table>
             <tr><td colspan="2" class="title">اسم الطالب: {{ result['NAME'] }}</td></tr>
-            <tr><th class="title">الدرجة</th><th class="title">البند</th></tr>
+            <tr><th class="title">MARK</th><th class="title">SUBJECT</th></tr>
             {% for key, value in result.items() %}
                 {% if key != 'ID' and key != 'NAME' %}
                     {% set key_upper = key.upper().strip() %}
@@ -73,10 +140,10 @@ html_template = """
                     <tr class="{{ css_class }}"><td>{{ value }}</td><td>{{ key }}</td></tr>
                 {% endif %}
             {% endfor %}
-            <tr class="footer"><td colspan="2">Designed by Abdo Hamdy Aly</td></tr>
+            <tr class="footer"><td colspan="2">Data collected , analyzed , coded by Abdo Hamdy Aly</td></tr>
         </table>
         {% elif searched %}
-            <p>لم يتم العثور على الطالب.</p>
+            <p>ID IS NOT FOUND</p>
         {% endif %}
     </div>
 </body>
