@@ -1,6 +1,9 @@
 from flask import Flask, render_template_string, request
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
+import io
+import base64
 
 app = Flask(__name__)
 
@@ -8,7 +11,7 @@ app = Flask(__name__)
 sheet1_df = pd.read_excel("data.xlsx", sheet_name="Sheet1")
 
 # HTML Template
-html_template = """
+html_template = """ 
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -17,15 +20,13 @@ html_template = """
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f0f4f8; /* خلفية ناعمة متناسقة */
+            background-color: #f0f4f8;
             text-align: center;
         }
-
         .container {
             margin: 60px auto;
             width: 70%;
         }
-
         table {
             border-collapse: collapse;
             margin: auto;
@@ -34,56 +35,47 @@ html_template = """
             direction: rtl;
             background-color: #fff;
         }
-
         th, td {
             border: 1px solid #ccc;
             padding: 10px;
             text-align: center;
         }
-
         th {
             width: 40%;
         }
-
         td {
             width: 60%;
             font-weight: bold;
         }
-
         .title {
             font-weight: bold;
             font-size: 20px;
-            background-color: #b3e5fc; /* أزرق سماوي خفيف */
+            background-color: #b3e5fc;
             color: #000;
         }
-
         .footer {
             background-color: #a0d080;
             font-style: italic;
         }
-
         .first-year { background-color: #e0f7fa; }
         .second-year { background-color: #fff3e0; }
         .third-year { background-color: #ede7f6; }
         .imsurgery { background-color: #d0e0ff; }
         .totals { background-color: #d0f8ce; }
         .rank { background-color: #ffe0f0; }
-
         form {
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-
         label.title {
             font-size: 28px;
             font-weight: normal;
             color: #333;
             margin-bottom: 15px;
-            background: none; /* إزالة التظليل */
+            background: none;
         }
-
         input[type="text"] {
             font-size: 24px;
             padding: 15px 25px;
@@ -91,7 +83,6 @@ html_template = """
             border: 1px solid #ccc;
             border-radius: 8px;
         }
-
         input[type="submit"] {
             font-size: 20px;
             padding: 12px 24px;
@@ -101,7 +92,6 @@ html_template = """
             color: white;
             border: none;
         }
-
         p {
             font-size: 22px;
             color: red;
@@ -140,10 +130,14 @@ html_template = """
                     <tr class="{{ css_class }}"><td>{{ value }}</td><td>{{ key }}</td></tr>
                 {% endif %}
             {% endfor %}
-            <tr class="footer"><td colspan="2">Data collected , analyzed , coded by Abdo Hamdy Aly</td></tr>
+            <tr class="footer"><td colspan="2">Designed by Abdo Hamdy Aly</td></tr>
         </table>
+        {% if plot_url %}
+            <h3>Student Score Distribution</h3>
+            <img src="data:image/png;base64,{{ plot_url }}">
+        {% endif %}
         {% elif searched %}
-            <p>ID IS NOT FOUND</p>
+            <p>لم يتم العثور على الطالب.</p>
         {% endif %}
     </div>
 </body>
@@ -153,7 +147,9 @@ html_template = """
 @app.route('/', methods=['GET', 'POST'])
 def search():
     result = None
+    plot_url = None
     searched = False
+
     if request.method == 'POST':
         student_id = request.form['student_id']
         searched = True
@@ -175,7 +171,28 @@ def search():
                 else:
                     formatted_result[key] = val
             result = formatted_result
-    return render_template_string(html_template, result=result, searched=searched)
+
+            # رسم الرسم البياني باللغة الإنجليزية
+            total_scores = sheet1_df['TOTAL'].dropna()
+            student_score = raw_result.get('TOTAL')
+
+            plt.figure(figsize=(8, 5))
+            plt.hist(total_scores, bins=20, color='#66b3ff', edgecolor='black')
+            plt.axvline(student_score, color='orange', linestyle='solid', linewidth=2,
+                        label=f'Student Score: {student_score}')
+            plt.xlabel('Scores')
+            plt.ylabel('Number of Students')
+            plt.title('Score Distribution with Student Highlighted')
+            plt.legend()
+
+            buf = io.BytesIO()
+            plt.savefig(buf, format='png')
+            buf.seek(0)
+            plot_url = base64.b64encode(buf.getvalue()).decode('utf8')
+            buf.close()
+            plt.close()
+
+    return render_template_string(html_template, result=result, searched=searched, plot_url=plot_url)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
