@@ -130,7 +130,15 @@ html_template = """
                     <tr class="{{ css_class }}"><td>{{ value }}</td><td>{{ key }}</td></tr>
                 {% endif %}
             {% endfor %}
-            <tr class="footer"><td colspan="2">Designed by Abdo Hamdy Aly</td></tr>
+            <tr class="footer"><td colspan="2">Designed and Coded By : Abdo Hamdy Aly</td></tr>
+            <tr>
+                <td colspan="2" style="text-align: center; font-size: 18px; padding: 15px;">
+                    <a href="https://t.me/Abdo_Hamdi6" target="_blank" style="text-decoration: none; color: black;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" style="width: 24px; vertical-align: middle; margin-left: 8px;">
+                        @Abdo_Hamdi6
+                    </a>
+                </td>
+            </tr>
         </table>
         {% if plot_url %}
             <h3>Student Score Distribution</h3>
@@ -142,7 +150,7 @@ html_template = """
             {% endif %}
         {% endif %}
         {% elif searched %}
-            <p>لم يتم العثور على الطالب.</p>
+            <p>Student not found</p>
         {% endif %}
     </div>
 </body>
