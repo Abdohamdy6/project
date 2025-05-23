@@ -9,6 +9,7 @@ app = Flask(__name__)
 
 # تحميل البيانات من ملف Excel
 sheet1_df = pd.read_excel("data.xlsx", sheet_name="Sheet1")
+sheet2_df = pd.read_excel("data.xlsx", sheet_name="Sheet2")
 
 # HTML Template
 html_template = """ 
@@ -140,6 +141,7 @@ html_template = """
                 </td>
             </tr>
         </table>
+
         {% if plot_url %}
             <h3>Student Score Distribution</h3>
             <img src="data:image/png;base64,{{ plot_url }}">
@@ -149,6 +151,12 @@ html_template = """
                 </p>
             {% endif %}
         {% endif %}
+
+        {% if rank_progress_url %}
+            <h3>Cumulative Rank Progress</h3>
+            <img src="data:image/png;base64,{{ rank_progress_url }}">
+        {% endif %}
+
         {% elif searched %}
             <p>Student not found</p>
         {% endif %}
@@ -161,6 +169,7 @@ html_template = """
 def search():
     result = None
     plot_url = None
+    rank_progress_url = None
     percentile = None
     searched = False
 
@@ -191,7 +200,6 @@ def search():
 
             if pd.notna(student_score):
                 percentile = round((total_scores < student_score).mean() * 100)
-
                 avg_score = total_scores.mean()
 
                 plt.figure(figsize=(8, 5))
@@ -210,7 +218,6 @@ def search():
                 mid_x = (student_score + avg_score) / 2
                 plt.text(mid_x, y_line + ymax * 0.03, f'{diff_percent}%', fontsize=10, fontweight='bold', ha='center', color='red')
 
-                # Add red dashed line legend label
                 plt.plot([], [], 'r--', label='% above/below average')
 
                 plt.xlabel('Scores')
@@ -225,7 +232,54 @@ def search():
                 buf.close()
                 plt.close()
 
-    return render_template_string(html_template, result=result, searched=searched, plot_url=plot_url, percentile=percentile)
+            rank_match = sheet2_df[sheet2_df['ID'].astype(str) == student_id]
+            if not rank_match.empty:
+                rank_data = rank_match.iloc[0].to_dict()
+            else:
+                rank_data = {}
+
+            rank_columns = {
+                "FIRST YEAR RANK": ("FIRST YEAR", "#e0f7fa"),
+                "SECOND YEAR RANK C": ("SECOND YEAR", "#fff3e0"),
+                "THIRD YEAR RANK C": ("THIRD YEAR", "#ede7f6"),
+                "TOTAL RANK": ("IM&SURGERY", "#d0e0ff"),
+            }
+
+            progress_labels = []
+            rank_values = []
+            colors = []
+
+            for col, (label, color) in rank_columns.items():
+                rank = rank_data.get(col)
+                if pd.notna(rank):
+                    progress_labels.append(label)
+                    rank_values.append(rank)
+                    colors.append(color)
+
+            if progress_labels and rank_values:
+                plt.figure(figsize=(8, 5))
+                plt.plot(progress_labels, rank_values, marker='o', linestyle='-', color='black', linewidth=2)
+
+                for i in range(len(progress_labels)):
+                    plt.plot(progress_labels[i], rank_values[i], '3', markersize=10, color=colors[i])
+                    plt.text(progress_labels[i], rank_values[i] + 0.5, f'{int(rank_values[i])}',
+                             ha='center', va='top', fontsize=12, fontweight='bold', color='black',
+                             bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor='black'))
+
+                plt.ylabel('Cumulative Rank (Lower is Better)')
+                plt.title('Cumulative Progress Based on Class Rank')
+                plt.gca().invert_yaxis()
+                plt.grid(True)
+
+                buf = io.BytesIO()
+                plt.savefig(buf, format='png')
+                buf.seek(0)
+                rank_progress_url = base64.b64encode(buf.getvalue()).decode('utf8')
+                buf.close()
+                plt.close()
+
+    return render_template_string(html_template, result=result, plot_url=plot_url,
+                                  rank_progress_url=rank_progress_url, percentile=percentile, searched=searched)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    app.run(debug=True)
