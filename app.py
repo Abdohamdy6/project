@@ -107,7 +107,7 @@ html_template = """
         </form>
         {% if result %}
         <table>
-            <tr><td colspan="2" class="title">Student Name: {{ result['NAME'] }}</td></tr>
+            <tr><td colspan="2" class="title">اسم الطالب : {{ result['NAME'] }}</td></tr>
             <tr><th class="title">MARK</th><th class="title">SUBJECT</th></tr>
             {% for key, value in result.items() %}
                 {% if key != 'ID' and key != 'NAME' %}
