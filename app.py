@@ -107,7 +107,7 @@ html_template = """
         </form>
         {% if result %}
         <table>
-            <tr><td colspan="2" class="title">اسم الطالب: {{ result['NAME'] }}</td></tr>
+            <tr><td colspan="2" class="title">Student Name: {{ result['NAME'] }}</td></tr>
             <tr><th class="title">MARK</th><th class="title">SUBJECT</th></tr>
             {% for key, value in result.items() %}
                 {% if key != 'ID' and key != 'NAME' %}
@@ -186,17 +186,33 @@ def search():
                     formatted_result[key] = val
             result = formatted_result
 
-            # رسم الرسم البياني مع حساب الـ PERCENTILE
             total_scores = sheet1_df['TOTAL'].dropna()
             student_score = raw_result.get('TOTAL')
 
             if pd.notna(student_score):
                 percentile = round((total_scores < student_score).mean() * 100)
 
+                avg_score = total_scores.mean()
+
                 plt.figure(figsize=(8, 5))
                 plt.hist(total_scores, bins=20, color='#66b3ff', edgecolor='black')
                 plt.axvline(student_score, color='orange', linestyle='solid', linewidth=2,
                             label=f'Student Score: {student_score}')
+                plt.axvline(avg_score, color='black', linestyle='dashed', linewidth=2,
+                            label='Class Average')
+
+                ymax = plt.gca().get_ylim()[1]
+                y_line = ymax * 0.7
+                plt.hlines(y_line, min(avg_score, student_score), max(avg_score, student_score),
+                           colors='red', linestyles='dashed', linewidth=2)
+
+                diff_percent = round(abs(student_score - avg_score) / 3180 * 100, 1)
+                mid_x = (student_score + avg_score) / 2
+                plt.text(mid_x, y_line + ymax * 0.03, f'{diff_percent}%', fontsize=10, fontweight='bold', ha='center', color='red')
+
+                # Add red dashed line legend label
+                plt.plot([], [], 'r--', label='% above/below average')
+
                 plt.xlabel('Scores')
                 plt.ylabel('Number of Students')
                 plt.title('Score Distribution with Student Highlighted')
