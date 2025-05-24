@@ -263,10 +263,25 @@ def search():
                 for i in range(len(progress_labels)):
                     plt.plot(progress_labels[i], rank_values[i], '3', markersize=10, color=colors[i])
                     plt.text(progress_labels[i], rank_values[i] + 0.5, f'{int(rank_values[i])}',
-                             ha='center', va='top', fontsize=12, fontweight='bold', color='black',
-                             bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor='black'))
+                             ha='center', va='top', fontsize=14, fontweight='bold', color='black',
+                             bbox=dict(boxstyle='round,pad=0.4', facecolor='white', edgecolor='black'))
 
-                plt.ylabel('Cumulative Rank (Lower is Better)')
+                    if i > 0:
+                        change = rank_values[i - 1] - rank_values[i]
+                        color = 'green' if change > 0 else 'red'
+                        sign = '+' if change > 0 else ''
+                        arrow = '⬆' if change > 0 else '⬇'
+
+                        mid_x = (i - 0.5)
+                        mid_y = (rank_values[i - 1] + rank_values[i]) / 2
+                        below_line_y = mid_y + 2.5
+
+                        plt.text(mid_x, below_line_y, f'{arrow} {sign}{abs(int(change))}',
+                                 fontsize=11, fontweight='bold', color=color,
+                                 ha='center', va='top',
+                                 bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor=color))
+
+                plt.ylabel('Cumulative Rank')
                 plt.title('Cumulative Progress Based on Class Rank')
                 plt.gca().invert_yaxis()
                 plt.grid(True)
