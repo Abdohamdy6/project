@@ -1,6 +1,5 @@
 from flask import Flask, render_template_string, request
 import pandas as pd
-import os
 import matplotlib.pyplot as plt
 import io
 import base64
@@ -23,10 +22,57 @@ html_template = """
             font-family: 'Arial', sans-serif;
             background-color: #f0f4f8;
             text-align: center;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            background-image: url('https://i.ibb.co/zHRhsP6j'); /* صورة الخلفية الجديدة */
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1; /* شفافية الخلفية */
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            position: fixed;
+            z-index: -1;
         }
         .container {
             margin: 60px auto;
             width: 70%;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            direction: ltr;
+        }
+        .header img {
+            height: 70px;
+            width: auto;
+            opacity: 0.85;
+        }
+        .header-text {
+            text-align: left;
+            direction: ltr;
+        }
+        .header-text h1 {
+            font-size: 36px;
+            margin: 0;
+            font-weight: bold;
+            color: #333;
+        }
+        .header-text p {
+            font-size: 18px;
+            margin: 5px 0 0 0;
+            font-style: italic;
+            color: #555;
         }
         table {
             border-collapse: collapse;
@@ -72,7 +118,7 @@ html_template = """
         }
         label.title {
             font-size: 28px;
-            font-weight: normal;
+            font-weight: 700; /* بولد */
             color: #333;
             margin-bottom: 15px;
             background: none;
@@ -92,6 +138,7 @@ html_template = """
             background-color: #4285f4;
             color: white;
             border: none;
+            cursor: pointer;
         }
         p {
             font-size: 22px;
@@ -101,11 +148,20 @@ html_template = """
 </head>
 <body>
     <div class="container">
+        <div class="header">
+            <img src="https://i.ibb.co/PZgW04kw/logo.png" alt="Logo">
+            <div class="header-text">
+                <h1>AFM 26 Results &amp; Analysis</h1>
+                <p>By : Abdo Hamdy Aly</p>
+            </div>
+        </div>
+
         <form method="POST">
             <label class="title">ENTER ID</label><br>
             <input type="text" name="student_id" required>
             <input type="submit" value="Search">
         </form>
+        
         {% if result %}
         <table>
             <tr><td colspan="2" class="title">اسم الطالب : {{ result['NAME'] }}</td></tr>
