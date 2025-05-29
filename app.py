@@ -68,11 +68,20 @@ html_template = """
             font-weight: bold;
             color: #333;
         }
+        .header-text h1 a {
+            text-decoration: none;
+            color: #333;
+        }
         .header-text p {
             font-size: 18px;
             margin: 5px 0 0 0;
             font-style: italic;
             color: #555;
+        }
+        .header-text p a {
+            text-decoration: none;
+            color: #555;
+            font-style: italic;
         }
         table {
             border-collapse: collapse;
@@ -151,8 +160,8 @@ html_template = """
         <div class="header">
             <img src="https://i.ibb.co/PZgW04kw/logo.png" alt="Logo">
             <div class="header-text">
-                <h1>AFM 26 Results &amp; Analysis</h1>
-                <p>By : Abdo Hamdy Aly</p>
+                <h1><a href="/">AFM 26 Results &amp; Analysis</a></h1>
+                <p><a href="https://t.me/Abdo_Hamdi6" target="_blank">By : Abdo Hamdy Aly</a></p>
             </div>
         </div>
 
