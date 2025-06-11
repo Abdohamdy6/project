@@ -17,6 +17,7 @@ html_template = """
 <head>
     <meta charset="UTF-8">
     <title>AFM 26 RESULTS</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logoTB.png') }}">
     <style>
         body {
             font-family: 'Arial', sans-serif;
