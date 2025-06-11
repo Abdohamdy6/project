@@ -6,11 +6,9 @@ import base64
 
 app = Flask(__name__)
 
-# تحميل البيانات من ملف Excel
 sheet1_df = pd.read_excel("data.xlsx", sheet_name="Sheet1")
 sheet2_df = pd.read_excel("data.xlsx", sheet_name="Sheet2")
 
-# HTML Template
 html_template = """ 
 <!doctype html>
 <html lang="ar" dir="rtl">
@@ -27,10 +25,10 @@ html_template = """
         }
         body::before {
             content: "";
-            background-image: url('https://i.ibb.co/zHRhsP6j'); /* صورة الخلفية الجديدة */
+            background-image: url('https://i.ibb.co/zHRhsP6j');
             background-size: cover;
             background-position: center;
-            opacity: 0.1; /* شفافية الخلفية */
+            opacity: 0.1;
             top: 0;
             left: 0;
             bottom: 0;
@@ -97,13 +95,8 @@ html_template = """
             padding: 10px;
             text-align: center;
         }
-        th {
-            width: 40%;
-        }
-        td {
-            width: 60%;
-            font-weight: bold;
-        }
+        th { width: 40%; }
+        td { width: 60%; font-weight: bold; }
         .title {
             font-weight: bold;
             font-size: 20px;
@@ -128,7 +121,7 @@ html_template = """
         }
         label.title {
             font-size: 28px;
-            font-weight: 700; /* بولد */
+            font-weight: 700;
             color: #333;
             margin-bottom: 15px;
             background: none;
@@ -153,6 +146,16 @@ html_template = """
         p {
             font-size: 22px;
             color: red;
+        }
+        .free-palestine {
+            margin-top: 40px;
+            padding: 25px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(90deg, black 25%, white 25% 50%, green 50% 75%, red 75% 100%);
+            border-radius: 12px;
+            text-shadow: 1px 1px 2px #000;
         }
     </style>
 </head>
@@ -222,6 +225,11 @@ html_template = """
             <h3>Cumulative Rank Progress</h3>
             <img src="data:image/png;base64,{{ rank_progress_url }}">
         {% endif %}
+        <!-- شريط دعم فلسطين -->
+        <div style="margin-top: 40px; padding: 20px 10px; border-radius: 12px;
+                    background: linear-gradient(to right, black, white, green, red);
+                    color: white; font-size: 24px; font-weight: bold; text-shadow: 1px 1px 2px black;">
+            FREE PALESTINE 🇵🇸
 
         {% elif searched %}
             <p>Student not found</p>
