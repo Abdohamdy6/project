@@ -120,33 +120,126 @@ html_template = """
             align-items: center;
         }
         label.title {
-            font-size: 28px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 15px;
-            background: none;
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: 'Arial Black', sans-serif;
         }
+        
+        /* Interactive Search Box Styles */
+        .search-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        
         input[type="text"] {
             font-size: 24px;
             padding: 15px 25px;
             width: 400px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        
+        input[type="text"]:focus {
+            border-color: #4285f4;
+            box-shadow: 0 0 15px rgba(66, 133, 244, 0.3);
+            transform: scale(1.02);
+        }
+        
         input[type="submit"] {
             font-size: 20px;
-            padding: 12px 24px;
+            padding: 12px 30px;
             margin-top: 15px;
-            border-radius: 8px;
-            background-color: #4285f4;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #4285f4, #34a853);
             color: white;
             border: none;
             cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
         }
+        
+        input[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+        }
+        
+        input[type="submit"]:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(66, 133, 244, 0.3);
+        }
+        
         p {
             font-size: 22px;
             color: red;
         }
+        
+        /* Chart Titles with Icons */
+        .chart-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 30px 0 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        /* Animated Percentile Box */
+        .percentile-box {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease infinite;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            border: 3px solid white;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .percentile-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 2s infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
         .free-palestine {
             margin-top: 40px;
             padding: 25px;
@@ -171,14 +264,17 @@ html_template = """
 
         <form method="POST">
             <label class="title">ENTER ID</label><br>
-            <input type="text" name="student_id" required>
-            <input type="submit" value="Search">
+            <div class="search-container">
+                <input type="text" name="student_id" required>
+                <br>
+                <input type="submit" value="🔎 Search">
+            </div>
         </form>
         
         {% if result %}
         <table>
-            <tr><td colspan="2" class="title">اسم الطالب : {{ result['NAME'] }}</td></tr>
-            <tr><th class="title">MARK</th><th class="title">SUBJECT</th></tr>
+            <tr><td colspan="2" class="title">👨‍🎓 اسم الطالب : {{ result['NAME'] }}</td></tr>
+            <tr><th class="title">📝 MARK</th><th class="title">📚 SUBJECT</th></tr>
             {% for key, value in result.items() %}
                 {% if key != 'ID' and key != 'NAME' %}
                     {% set key_upper = key.upper().strip() %}
@@ -200,39 +296,39 @@ html_template = """
                     <tr class="{{ css_class }}"><td>{{ value }}</td><td>{{ key }}</td></tr>
                 {% endif %}
             {% endfor %}
-            <tr class="footer"><td colspan="2">Designed and Coded By : Abdo Hamdy Aly</td></tr>
+            <tr class="footer"><td colspan="2">💻 Designed and Coded By : Abdo Hamdy Aly</td></tr>
             <tr>
                 <td colspan="2" style="text-align: center; font-size: 18px; padding: 15px;">
                     <a href="https://t.me/Abdo_Hamdi6" target="_blank" style="text-decoration: none; color: black;">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" style="width: 24px; vertical-align: middle; margin-left: 8px;">
-                        @Abdo_Hamdi6
+                        📱 @Abdo_Hamdi6
                     </a>
                 </td>
             </tr>
         </table>
 
         {% if plot_url %}
-            <h3>Student Score Distribution</h3>
+            <div class="chart-title">📈 Student Score Distribution</div>
             <img src="data:image/png;base64,{{ plot_url }}">
             {% if percentile %}
-                <p style="font-size: 20px; font-weight: bold; color: black;">
-                    YOU ARE IN THE {{ percentile }}th PERCENTILE!
-                </p>
+                <div class="percentile-box">
+                    🎯 YOU ARE IN THE {{ percentile }}th PERCENTILE! 🏆
+                </div>
             {% endif %}
         {% endif %}
 
         {% if rank_progress_url %}
-            <h3>Cumulative Rank Progress</h3>
+            <div class="chart-title">📊 Cumulative Rank Progress</div>
             <img src="data:image/png;base64,{{ rank_progress_url }}">
         {% endif %}
         <!-- شريط دعم فلسطين -->
         <div style="margin-top: 40px; padding: 20px 10px; border-radius: 12px;
                     background: linear-gradient(to right, black, white, green, red);
                     color: white; font-size: 24px; font-weight: bold; text-shadow: 1px 1px 2px black;">
-            FREE PALESTINE 🇵🇸
+            🇵🇸 FREE PALESTINE 🇵🇸
 
         {% elif searched %}
-            <p>Student not found</p>
+            <p>❌ Student not found</p>
         {% endif %}
     </div>
 </body>
