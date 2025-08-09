@@ -110,7 +110,7 @@ html_template = """
         .first-year { background-color: #e0f7fa; }
         .second-year { background-color: #fff3e0; }
         .third-year { background-color: #ede7f6; }
-        .imsurgery { background-color: #d0e0ff; }
+        .fourth-year { background-color: #d0e0ff; }
         .totals { background-color: #d0f8ce; }
         .rank { background-color: #ffe0f0; }
         form {
@@ -284,8 +284,8 @@ html_template = """
                         {% set css_class = 'second-year' %}
                     {% elif key_upper in ['THIRD YEAR', 'LONG THIRD YEAR', 'RESEARCH STEP III', 'COMMUNICATION STEP III', 'PROFESSIONALISM STEP III'] %}
                         {% set css_class = 'third-year' %}
-                    {% elif key_upper in ['IM&SURGERY', 'IM&SURGERY RANK'] %}
-                        {% set css_class = 'imsurgery' %}
+                    {% elif key_upper in ['FOURTH YEAR', 'LONG FOURTH YEAR', 'RESEARCH STEP IIII', 'COMMUNICATION STEP IIII', 'PROFESSIONALISM STEP IIII'] %}
+                        {% set css_class = 'fourth-year' %}
                     {% elif key_upper in ['TOTAL', 'TOTAL RANK', '%', 'PERCENTAGE'] %}
                         {% set css_class = 'totals' %}
                     {% elif 'RANK' in key_upper %}
@@ -384,7 +384,7 @@ def search():
                 plt.hlines(y_line, min(avg_score, student_score), max(avg_score, student_score),
                            colors='red', linestyles='dashed', linewidth=2)
 
-                diff_percent = round(abs(student_score - avg_score) / 3180 * 100, 1)
+                diff_percent = round(abs(student_score - avg_score) / 3255 * 100, 1)
                 mid_x = (student_score + avg_score) / 2
                 plt.text(mid_x, y_line + ymax * 0.03, f'{diff_percent}%', fontsize=10, fontweight='bold', ha='center', color='red')
 
@@ -412,7 +412,7 @@ def search():
                 "FIRST YEAR RANK": ("FIRST YEAR", "#e0f7fa"),
                 "SECOND YEAR RANK C": ("SECOND YEAR", "#fff3e0"),
                 "THIRD YEAR RANK C": ("THIRD YEAR", "#ede7f6"),
-                "TOTAL RANK": ("IM&SURGERY", "#d0e0ff"),
+                "FOURTH YEAR RANK C": ("FOURTH YEAR", "#d0e0ff"),
             }
 
             progress_labels = []
