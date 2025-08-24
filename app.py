@@ -547,17 +547,17 @@ html_template = """
             
             {% if need_result['required_5th_year_percentage'] < 60 %}
                 <div class="motivational-message" style="background: linear-gradient(45deg, #f44336, #ff5722);">
-                    ❌ Target requires <span class="highlight-number">{{ need_result['required_5th_year_score'] }}</span> points (<span class="highlight-number">{{ need_result['required_5th_year_percentage'] }}%</span>) in 5th year, which is below 60%!
+                    ❌ Target requires <span class="highlight-number">{{ need_result['required_5th_year_score'] }}</span> marks (<span class="highlight-number">{{ need_result['required_5th_year_percentage'] }}%</span>) in 5th year, which is below 60%!
                     <br><br>This is impossible! Minimum passing grade for 5th year is 60%. Please set a more realistic target! 🎯
                 </div>
             {% elif need_result['required_5th_year_percentage'] <= 100 and need_result['required_5th_year_percentage'] >= 60 %}
                 <div class="motivational-message">
-                    🎯 You need to score <span class="highlight-number">{{ need_result['required_5th_year_score'] }}</span> points out of 1245 (<span class="highlight-number">{{ need_result['required_5th_year_percentage'] }}%</span>) in your 5th year to reach {{ need_result['target_percentage'] }}% total!
+                    🎯 You need to score <span class="highlight-number">{{ need_result['required_5th_year_score'] }}</span> marks out of 1245 (<span class="highlight-number">{{ need_result['required_5th_year_percentage'] }}%</span>) in your 5th year to reach {{ need_result['target_percentage'] }}% total!
                     <br><br>{% if need_result['required_5th_year_percentage'] <= 70 %}Easy target! 💪{% elif need_result['required_5th_year_percentage'] <= 80 %}Good target! Keep working! 📚{% elif need_result['required_5th_year_percentage'] <= 90 %}Challenging but achievable! 🔥{% else %}Very challenging! Give your best! 🚀{% endif %}
                 </div>
             {% elif need_result['required_5th_year_percentage'] > 100 %}
                 <div class="motivational-message" style="background: linear-gradient(45deg, #f44336, #ff5722);">
-                    ⚠️ Target requires <span class="highlight-number">{{ need_result['required_5th_year_score'] }}</span> points (<span class="highlight-number">{{ need_result['required_5th_year_percentage'] }}%</span>) in 5th year, which is above 100%!
+                    ⚠️ Target requires <span class="highlight-number">{{ need_result['required_5th_year_score'] }}</span> marks (<span class="highlight-number">{{ need_result['required_5th_year_percentage'] }}%</span>) in 5th year, which is above 100%!
                     <br><br>Consider a more realistic target! 🎯
                 </div>
             {% else %}
@@ -606,11 +606,11 @@ html_template = """
                 <div class="progress-arrow">
                     <div class="progress-difference {% if distance_result['points_needed'] > 0 %}positive{% elif distance_result['points_needed'] == 0 %}neutral{% else %}negative{% endif %}">
                         {% if distance_result['points_needed'] > 0 %}
-                            +{{ distance_result['points_needed'] }} Points
+                            {{ distance_result['points_needed'] }} Marks Behind
                         {% elif distance_result['points_needed'] == 0 %}
                             At Target!
                         {% else %}
-                            {{ distance_result['points_needed']|abs }} Points Ahead
+                            {{ distance_result['points_needed']|abs }} Marks Ahead
                         {% endif %}
                     </div>
                 </div>
@@ -623,17 +623,17 @@ html_template = """
             
             {% if distance_result['points_needed'] > 0 %}
                 <div class="motivational-message">
-                    🚀 You need <span class="highlight-number">{{ distance_result['points_needed'] }}</span> more points to reach rank #{{ distance_result['target_rank'] }}!
+                    📏 The difference between your current rank (#{{ distance_result['current_rank'] }}) and rank #{{ distance_result['target_rank'] }} is <span class="highlight-number">{{ distance_result['points_needed'] }}</span> marks.
                     <br><br>Keep pushing forward! 💪
                 </div>
             {% elif distance_result['points_needed'] == 0 %}
                 <div class="motivational-message" style="background: linear-gradient(45deg, #4CAF50, #45a049);">
-                    🎉 Congratulations! You're already at or above rank #{{ distance_result['target_rank'] }}! 
-                    <br><br>Amazing job! 🏆
+                    🎉 Congratulations! You're exactly at rank #{{ distance_result['target_rank'] }}! 
+                    <br><br>Perfect achievement! 🏆
                 </div>
             {% else %}
                 <div class="motivational-message" style="background: linear-gradient(45deg, #4CAF50, #45a049);">
-                    🌟 You're already <span class="highlight-number">{{ distance_result['points_needed']|abs }}</span> points ahead of rank #{{ distance_result['target_rank'] }}!
+                    🌟 You're ahead of your target! The difference between rank #{{ distance_result['target_rank'] }} and your current rank (#{{ distance_result['current_rank'] }}) is <span class="highlight-number">{{ distance_result['points_needed']|abs }}</span> marks.
                     <br><br>You're doing great! Keep it up! 🔥
                 </div>
             {% endif %}
