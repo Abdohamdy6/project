@@ -472,6 +472,10 @@ html_template = """
             display: block;
         }
     </style>
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
     <div class="container">
@@ -483,7 +487,6 @@ html_template = """
             </div>
         </div>
 
-        <!-- Navigation Buttons -->
         <div class="nav-buttons">
             <a href="/?mode=search" class="nav-btn search {{ 'active' if mode == 'search' or not mode else '' }}">
                 🔍 Student Search
@@ -497,7 +500,6 @@ html_template = """
         </div>
 
         {% if mode == 'need' %}
-        <!-- Need Mode -->
         <form method="POST" action="/?mode=need">
             <label class="title">HOW MUCH I NEED</label><br>
             <div class="search-container">
@@ -573,7 +575,6 @@ html_template = """
         {% endif %}
 
         {% elif mode == 'distance' %}
-        <!-- Distance Mode -->
         <form method="POST" action="/?mode=distance">
             <label class="title">HOW FAR I AM</label><br>
             <div class="search-container">
@@ -644,7 +645,6 @@ html_template = """
         {% endif %}
 
         {% else %}
-        <!-- Search Mode (Default) -->
         <form method="POST" action="/?mode=search">
             <label class="title">ENTER ID</label><br>
             <div class="search-container">
@@ -710,7 +710,6 @@ html_template = """
         {% endif %}
         {% endif %}
 
-        <!-- شريط دعم فلسطين -->
         <div style="margin-top: 40px; padding: 20px 10px; border-radius: 12px;
                     background: linear-gradient(to right, black, white, green, red);
                     color: white; font-size: 24px; font-weight: bold; text-shadow: 1px 1px 2px black;">
