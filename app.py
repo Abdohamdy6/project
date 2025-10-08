@@ -9,6 +9,14 @@ app = Flask(__name__)
 sheet1_df = pd.read_excel("data.xlsx", sheet_name="Sheet1")
 sheet2_df = pd.read_excel("data.xlsx", sheet_name="Sheet2")
 
+# Load residency data
+try:
+    residency_24_df = pd.read_excel("24.xlsx")
+    residency_25_df = pd.read_excel("25.xlsx")
+except FileNotFoundError:
+    residency_24_df = pd.DataFrame()
+    residency_25_df = pd.DataFrame()
+
 html_template = """ 
 <!doctype html>
 <html lang="ar" dir="rtl">
@@ -133,6 +141,10 @@ html_template = """
         
         .nav-btn.need {
             background: linear-gradient(45deg, #9c27b0, #e91e63);
+        }
+        
+        .nav-btn.residency {
+            background: linear-gradient(45deg, #f39c12, #e74c3c);
         }
         
         .nav-btn:hover {
@@ -497,6 +509,9 @@ html_template = """
             <a href="/?mode=need" class="nav-btn need {{ 'active' if mode == 'need' else '' }}">
                 🎯 How Much I Need
             </a>
+            <a href="/residency?year=2024" class="nav-btn residency">
+                🏥 Residency Matching
+            </a>
         </div>
 
         {% if mode == 'need' %}
@@ -713,6 +728,402 @@ html_template = """
         <div style="margin-top: 40px; padding: 20px 10px; border-radius: 12px;
                     background: linear-gradient(to right, black, white, green, red);
                     color: white; font-size: 24px; font-weight: bold; text-shadow: 1px 1px 2px black;">
+            🇵🇸 FREE PALESTINE 🇵🇸
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+residency_template = """
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Residency Matching Results</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logoTB.png') }}">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            text-align: center;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            background-image: url('https://i.ibb.co/zHRhsP6j');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            position: fixed;
+            z-index: -1;
+        }
+        .container {
+            margin: 60px auto;
+            width: 90%;
+            max-width: 1400px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            direction: ltr;
+        }
+        .header img {
+            height: 70px;
+            width: auto;
+            opacity: 0.85;
+        }
+        .header-text {
+            text-align: left;
+            direction: ltr;
+        }
+        .header-text h1 {
+            font-size: 36px;
+            margin: 0;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 1px;
+            font-family: 'Arial Black', sans-serif;
+        }
+        .header-text h1 a {
+            text-decoration: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-text p {
+            font-size: 18px;
+            margin: 5px 0 0 0;
+            font-style: italic;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .header-text p a {
+            text-decoration: none;
+            font-style: italic;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .nav-btn.home {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+        
+        .nav-btn.year-2024 {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        }
+        
+        .nav-btn.year-2025 {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(45deg, #333, #555);
+        }
+        
+        .page-title {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 30px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: 'Arial Black', sans-serif;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 30px 0;
+        }
+        
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+            width: 100%;
+            font-size: 16px;
+            direction: rtl;
+            background-color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            padding: 15px 10px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        td {
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #e3f2fd;
+            transition: background-color 0.3s ease;
+        }
+        
+        .boast-yes {
+            background-color: #c8e6c9 !important;
+            font-weight: bold;
+        }
+        
+        .boast-yes:hover {
+            background-color: #a5d6a7 !important;
+        }
+        
+        .boast-no {
+            background-color: #ffe0b2 !important;
+        }
+        
+        .boast-no:hover {
+            background-color: #ffcc80 !important;
+        }
+        
+        .rank-col {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        p.error {
+            font-size: 22px;
+            color: #f44336;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+        
+        .search-box {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 10px;
+        }
+        
+        .search-box input {
+            font-size: 18px;
+            padding: 10px 20px;
+            width: 300px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .free-palestine {
+            margin-top: 40px;
+            padding: 20px 10px;
+            border-radius: 12px;
+            background: linear-gradient(to right, black, white, green, red);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px black;
+        }
+    </style>
+    <script>
+        function filterTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('residencyTable');
+            const tr = table.getElementsByTagName('tr');
+            
+            for (let i = 1; i < tr.length; i++) {
+                let found = false;
+                const td = tr[i].getElementsByTagName('td');
+                
+                for (let j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        const txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                tr[i].style.display = found ? '' : 'none';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://i.postimg.cc/0rHzBdbx/8.jpg" alt="Logo">
+            <div class="header-text">
+                <h1><a href="/">AFM 26 Results & Analysis</a></h1>
+                <p><a href="https://t.me/Abdo_Hamdi6" target="_blank">By : Abdo Hamdy Aly</a></p>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="/" class="nav-btn home">🏠 Home</a>
+            <a href="/residency?year=2024" class="nav-btn year-2024 {{ 'active' if year == '2024' else '' }}">
+                🏥 2024 Residencies
+            </a>
+            <a href="/residency?year=2025" class="nav-btn year-2025 {{ 'active' if year == '2025' else '' }}">
+                🏥 2025 Residencies
+            </a>
+        </div>
+
+        <div class="page-title">
+            🩺 RESIDENCY MATCHING {{ year }}
+        </div>
+
+        {% if df_empty %}
+            <p class="error">⚠️ No data available for {{ year }}</p>
+        {% else %}
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-label">Total Students</div>
+                    <div class="stat-number">{{ results|length }}</div>
+                </div>
+                <div class="stat-box" style="background: linear-gradient(135deg, #4ecdc4, #44a08d);">
+                    <div class="stat-label">With Post</div>
+                    <div class="stat-number">{{ boast_count }}</div>
+                </div>
+                <div class="stat-box" style="background: linear-gradient(135deg, #ff6b6b, #ee5a52);">
+                    <div class="stat-label">Without Post</div>
+                    <div class="stat-number">{{ no_boast_count }}</div>
+                </div>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="🔍 Search by Rank, Residency...">
+            </div>
+
+            <div class="table-container">
+                <table id="residencyTable">
+                    <thead>
+                        <tr>
+                            <th>RANK</th>
+                            <th>RESIDENCY</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in results %}
+                        {% set status_val = row.get('STATUS', '')|string|trim %}
+                        <tr class="{% if status_val == 'بوست' %}boast-yes{% else %}boast-no{% endif %}">
+                            <td class="rank-col">{{ row.get('RANK', '-') }}</td>
+                            <td>{{ row.get('RESIDENCY', '-') }}</td>
+                            <td>
+                                {% if status_val == 'بوست' %}
+                                    ✅ {{ row['STATUS'] }}
+                                {% else %}
+                                    {{ row.get('STATUS', '-') }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        <div class="free-palestine">
             🇵🇸 FREE PALESTINE 🇵🇸
         </div>
     </div>
@@ -945,6 +1356,38 @@ def main():
                                   distance_searched=distance_searched,
                                   need_result=need_result,
                                   need_searched=need_searched)
+
+@app.route('/residency', methods=['GET'])
+def residency_matching():
+    year = request.args.get('year', '2024')
+    
+    # Select the appropriate dataframe
+    if year == '2025':
+        df = residency_25_df
+    else:
+        df = residency_24_df
+    
+    # Convert dataframe to list of dictionaries for display
+    results = []
+    boast_count = 0
+    no_boast_count = 0
+    
+    if not df.empty:
+        results = df.to_dict('records')
+        # Count students with and without boast
+        for row in results:
+            status = str(row.get('STATUS', ''))
+            if status.strip() == 'بوست':
+                boast_count += 1
+            elif status.strip() == 'بدون بوست':
+                no_boast_count += 1
+    
+    return render_template_string(residency_template, 
+                                  year=year,
+                                  results=results,
+                                  df_empty=df.empty,
+                                  boast_count=boast_count,
+                                  no_boast_count=no_boast_count)
 
 if __name__ == '__main__':
     app.run(debug=True)
