@@ -1253,13 +1253,18 @@ def main():
                 if pd.notna(student_score):
                     percentile = round((total_scores < student_score).mean() * 100)
                     avg_score = total_scores.mean()
+                    
+                    # Calculate average percentage based on total marks (3630)
+                    avg_percentage = (avg_score / 3630) * 100
 
                     plt.figure(figsize=(8, 5))
                     plt.hist(total_scores, bins=20, color='#66b3ff', edgecolor='black')
                     plt.axvline(student_score, color='orange', linestyle='solid', linewidth=2,
                                 label=f'Student Score: {student_score}')
+                    
+                    # Modified label to include percentage
                     plt.axvline(avg_score, color='black', linestyle='dashed', linewidth=2,
-                                label='Class Average')
+                                label=f'Class Average ({round(avg_percentage, 2)}%)')
 
                     ymax = plt.gca().get_ylim()[1]
                     y_line = ymax * 0.7
